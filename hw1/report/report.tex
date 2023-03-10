@@ -1,4 +1,4 @@
-\documentclass[twocolumn]{extarticle}
+\documentclass[twocolumn, draft]{extarticle}
 \usepackage{fontspec}   %加這個就可以設定字體
 \usepackage{xeCJK}       %讓中英文字體分開設置
 \usepackage{indentfirst}
@@ -163,7 +163,7 @@ As I mentioned earlier, because the kernel size of first convolution layer is to
 
 In conclusion, changing the architecture of ResNet can indeed significantly improve the model's accuracy.
 
-\subsubsection{Comparing whether there is a pre-trained weight for ResNet-18}
+\subsubsection{Comparing whether there is a pre-trained weight for ResNet-18}\label{sec: pre-trained}
 
 PyTorch provides a pretrained weight for ResNet-18. However, the pretrained weight is trained on ImageNet datasets. Therefore, it might perform well on CIFAR-10 datasets. Because of this I make an experiment to test how the existence of pretrained weight affect the performance of model.
 
@@ -177,6 +177,14 @@ As we can see in the chart (\autoref{chart: mlp_1} to \autoref{chart: mlp_4}), t
 
 \subsubsection{Compare Different Amount of Training Data}
 
+In this section, I will first analysis ResNet-18 case, and then analysis MLP case. 
+
+Noted that though the number of training data is different, the testing data for both model is exactly the same.
+
+First, for ResNet-18, we can look at \autoref{fig:resnet-half-cifar-acc} and \autoref{fig:resnet-half-cifar-loss}. As we can observe, the ``half'' one train much more slower than the ResNet-18 that trained with full training CIFAR-10 datasets, which contains 50000 images. And the final test accuracy, the ``half'' one's accuracy is 0.8782. Which is less than the full-trained model by around 5\%.
+
+Second, let's look at the MLP. Also we can observe that in \autoref{fig:mlp-half-cifar-acc} and \autoref{fig:mlp-half-cifar-loss}, the training accuracy of the MLP with full training datasets is slightly better, and for the testing accuracy, it is nearly the same. The ``Half MLP'' is 0.5816, and the ``Full MLP`` is 0.5886.
+
 \subsubsection{Compare with SOTA Model}
 
 After researching, the state-of-the-art model on CIFAR-10 is Vision Transformer (ViT). In particularly, the ViT-H/14 model can achieve 99.5\% test accuracy, which is astonishing results. However, this model require 632M parameters, in the contrast, ResNet-18 only requires 11M parameter.
@@ -187,17 +195,58 @@ In conclusion, ViT is 57 times larger than ResNet-18, but it only increase 7\% o
 
 From the above comparing, we know that the best performance for ResNet-18 is the modified ResNet-18 without pretrained weights. As for MLP, the best model is with 2500 hidden neurons. And the SOTA model for CIFAR-10 is ViT-H/18. 
 
-For the overall comparison table, can reference to \autoref{table: cifar-table}.
-
+For the overall comparison table, please refer to \autoref{table: cifar-table}.
 
 \subsection{Discussion}
 
 \subsubsection{Assessing Expected Results and Behaviors in Experiments}\label{sec: discuss-1}
 
+\begin{enumerate}
+\item \textbf{Using pretrained weights or not}
+
+In \ref{sec: pre-trained}, I compare the performance of the ResNet-18 with or without pretrained weights. And the result is the model without pretrained weights has better performance.
+
+One can guess the model with pretrained weights might be better, but it's not. I think one main reason is that I already changed the model architecture, therefore the idea of ``transfer learning'' didn't work well here. And also, the distribution of CIFAR-10 and ImageNet is also difference. Therefore, trained the model from scratch might be a better idea.
+
+In conclusion, I think these are the two main reasons why the model without pretrained weights is better.
+
+\end{enumerate}
 
 \subsubsection{Factors Affecting Performance}
+
+\begin{enumerate}
+\item Model architecture
+\item Different hyperparameters
+\item Number of epochs count
+\item Number of training data
+\item LR scheduler
+
+Using LR scheduler is actually really important for machine learning, especially when SGD is used. Because larger LR in the later stage of training might make the model can't converge to optimal point. Therefore it's necessary to have LR scheduler.
+\end{enumerate}
+
 \subsubsection{Future Experiments}
+
+\begin{enumerate}
+\item \textbf{Using adam optimizer instead of SGD.}
+
+The adam optimizer can change the learning rate of each weights, which is might be a better method compared with LR decay. The SGD along with LR decay method may take longer time to converge.
+\item \textbf{Apply features extractions before sending into MLP.}
+
+Apply features extractions on images can extract useful features, and using these extracted features might be able to improve the MLP performance.
+\end{enumerate}
+
 \subsubsection{Findings and Open Questions from Experiments}
+
+\begin{enumerate}
+\item \textbf{MLP doesn't perform very well}
+
+Before conducting the experiment, I thought it may achieve an accuracy around 70\%. But it turns out only get 60\%.
+
+\item \textbf{Changing the architecture of the CNN is useful}
+
+I improved the model's accuracy by 5\% by only changing the kernel size of one layer and removing one max pooling layer. This is a new inspiration for me that sometimes we need to compare the difference of the images we need to classify now with the designated image, and based on the input images to design the proper architecture. 
+\end{enumerate}
+
 \section{Public Non-Image Datasets: 20 Newgroups}
 \subsection{Datasets Description}
 
@@ -209,18 +258,20 @@ In this project, I will use vectorize version of this datasets. This is done by 
 
 \subsection{Algorithms}
 
-In this datasets, I use four kinds of ensemble learning algorithms, Random Forest Classifier, Gradient Boosting Classifier, Histogram-based Gradient Boosting Classifier and AdaBoost Classifier. And a MLP Classifier, which is same MLP architecture in the first datasets. Therefore, I will only talk about the four ensemble learning algorithms.
+In this datasets, I use four kinds of ensemble learning algorithms, Random Forest Classifier, Gradient Boosting Classifier, Histogram-based Gradient Boosting Classifier and AdaBoost Classifier. One SVM algorithm, linear SVM. And a MLP Classifier, which is same MLP architecture in the first datasets. Therefore, I will only talk about the four ensemble learning algorithms and the SVM algorithm.
 
 Random Forest Classifier, Gradient Boosting Classifier, Histogram-based Gradient Boosting Classifier and AdaBoost Classifier are all powerful machine learning algorithms commonly used for classification tasks. These algorithms are known for their ability to handle complex datasets and provide accurate predictions.
 
-These five classifiers can be found in the \texttt{scikit-learn} library. In the following experiments, I directly apply the default value of \texttt{scikit-learn} provides. I state the option clearly in different classifier.
+And SVM (Support Vector Machines) is also a machine learning algorithm used for classification and regression analysis. It was developed by Vapnik and his colleagues in the 1990s. SVM is a supervised learning algorithm that works by finding the optimal hyperplane that separates the data into different classes. The hyperplane is chosen in a way that maximizes the margin between the closest data points from each class. These closest data points are known as support vectors.
+
+These six classifiers can be found in the \texttt{scikit-learn} library. In the following experiments, I directly apply the default value of \texttt{scikit-learn} provides. I state the option clearly in different classifier.
 
 \subsubsection{Random Forest Classifier}
 
 Random Forest Classifier is an ensemble learning algorithm that creates multiple decision trees and combines their outputs to make a final prediction. Each tree is trained on a random subset of the features and samples of the dataset, making the algorithm robust to overfitting. The final prediction is made by taking the mode of the predictions of all trees in the forest.
 
 \begin{itemize}
-\item The number of tree: 100
+\item The number of tree: 1000 or 500　(compare the difference)
 \item Criterion: Gini Impurity
 \end{itemize}
 
@@ -231,7 +282,7 @@ Gradient Boosting Classifier is another ensemble learning algorithm that creates
 Gradient Boosting algorithm is widely used in many machine learning competitions in Kaggle. This is reason why I choose this algorithms in this project.
 
 \begin{itemize}
-\item The Number of Tree: 100
+\item The Number of Tree: 100 or 50　(compare the difference)
 \item Loss Function: \texttt{log\_loss}
 \item Criterion: \texttt{friedman\_mse}
 \item Learning Rate: 0.1
@@ -251,7 +302,7 @@ Overall, while the standard gradient boosting classifier is a powerful algorithm
 The \texttt{scikit-learn} implementation is inspired by \href{https://github.com/Microsoft/LightGBM}{LightGBM}.
 
 \begin{itemize}
-\item Epoch: 100
+\item Epoch: 100 or 50　(compare the difference)
 \item Loss Function: \texttt{log\_loss}
 \item Learning Rate: 0.1
 \item Maximum Leaf Nodes: 31
@@ -266,8 +317,20 @@ AdaBoost Classifier, short for Adaptive Boosting Classifier, is also an ensemble
 
 \begin{itemize}
 \item Estimator: Decision tree with maximum depth 1
-\item Number of Estimators: 50
+\item Number of Estimators: 50 or 500 (compare the difference)
 \item Algorithm: SAMME.R
+\end{itemize}
+
+\subsubsection{Linear SVM Classifier}
+
+Linear SVM is a specific type of SVM that assumes the data is linearly separable, meaning that a straight line can be drawn to separate the data points into different classes. Linear SVM is used when the data is linearly separable, which means that the data can be classified into two or more classes by a straight line. In this case, the SVM algorithm finds the optimal hyperplane in a way that maximizes the margin between the closest data points from each class while keeping the classification error rate as low as possible.
+
+Linear SVM is a simple and effective algorithm that works well on a wide range of problems. However, it may not work well when the data is not linearly separable. In this case, other types of SVMs or non-linear methods may be more appropriate.
+
+\begin{itemize}
+\item Penalty: L2
+\item Loss: squared hinge
+\item dual: True or False (compare the difference)
 \end{itemize}
 
 \subsubsection{MLP Classifier}
@@ -293,15 +356,45 @@ Noted that this MLP Classifier is the built-in version in scikit-learn.
 \subsubsection{Compare Different Histogram-based Gradient Boosting Classifier}
 \subsubsection{Compare Different AdaBoost Classifier}
 \subsubsection{Compare Different MLP Classifier}
-\subsubsection{Overall Comparison}
 \subsubsection{Compare Different Amount of Training Data}
 \subsubsection{Compare with SOTA Model}
 
+Currently, to my best knowledge, the SOTA of 20 newsgroups datasets is \href{https://arxiv.org/abs/2211.02563v1}{LinearSVM+TFIDF}. TFIDF is a kind of vectorizer and LinearSVM is just a simple SVM algorithm.
+
+\subsubsection{Overall Comparison}
+
 \subsection{Discussion}
 \subsubsection{Assessing Expected Results and Behaviors in Experiments}
+
+Before conducting the experiment, I guess the Adaboost or histogram-based gradient boosting algorithm may perform pretty well. Because I heard that GB algorithms perform really well on lots of Kaggle competition. However, after the experiments, I found that the best model is simple linear SVM classifier, and it only took around 2 minutes to finished training. Compared to histogram-based gradient boosting, it takes nearly 40 minutes to binning the data, and 4.6 hours to train the model. Which is really time-consuming, and the result is not really good. This really surprised me. I will have more research on this behavior after this project.
+
 \subsubsection{Factors Affecting Performance}
+
+\begin{enumerate}
+\item Different algorithms
+\item The latent distribution of data
+\item Different vectorizer and preprocessing method
+\end{enumerate}
+
 \subsubsection{Future Experiments}
+
+\begin{enumerate}
+\item \textbf{Try to use different vectorizer}
+\item \textbf{Try more text preprocessing}
+
+Including removing stop words, stemming, etc.
+
+\item \textbf{Try to use NLP Model like BERT}
+\end{enumerate}
+
 \subsubsection{Findings and Open Questions from Experiments}
+
+\begin{enumerate}
+\item Linear SVM classifier is a great model for some cases
+\item Histogram-based gradient boosting is time consuming
+\item For simple classification task, the traditional machine learning can already perform really well
+\end{enumerate}
+
 \section{Self-made Datasets: Satellite Images of 5 Regions}
 \subsection{Datasets Description}
 
@@ -388,6 +481,20 @@ For MLP, because directly use $3 \times 256 \times 256$ as input layer is too la
 
 \begin{figure}[H]
 \centering
+\includegraphics[width=0.9\linewidth]{charts/resnet-cifar-auc}
+\caption{Accuracy table of pretrained ResNet-18}
+\label{chart:resnet-cifar-auc}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{"charts/resnet-cifar-conf"}
+\caption{Confusion matrix of pretrained ResNet-18}
+\label{fig:resnet-cifar-conf}
+\end{figure}
+
+\begin{figure}[H]
+\centering
 \includegraphics[width=0.9\linewidth]{charts/mlp_cifar_10_train_acc}
 \caption{Training accuracy of two MLP models on CIFAR-10 datasets}
 \label{chart: mlp_1}
@@ -414,19 +521,35 @@ For MLP, because directly use $3 \times 256 \times 256$ as input layer is too la
 \label{chart: mlp_4}
 \end{figure}
 
+
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\linewidth]{charts/resnet-cifar-auc}
-\caption{AUC Table of pretrained ResNet-18}
-\label{chart:resnet-cifar-auc}
+\includegraphics[width=0.9\linewidth]{charts/resnet-half-cifar-acc}
+\caption{Training and testing accuracy of ResNet-18 with different training data amount. The ``Half-ResNet-18'' is trained with only 25000 training images.}
+\label{fig:resnet-half-cifar-acc}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\linewidth]{"charts/resnet-cifar-conf"}
-\caption{Confusion matrix of pretrained ResNet-18}
-\label{fig:resnet-cifar-conf}
+\includegraphics[width=0.9\linewidth]{charts/resnet-half-cifar-loss}
+\caption{Training and testing loss of ResNet-18 with different training data amount. The ``Half-ResNet-18'' is trained with only 25000 training images.}
+\label{fig:resnet-half-cifar-loss}
 \end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{charts/mlp-half-cifar-acc}
+\caption{Training and testing accuracy of MLP with different training data amount. The ``Half MLP'' is trained with only 25000 training images.}
+\label{fig:mlp-half-cifar-acc}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{charts/mlp-half-cifar-loss}
+\caption{Training and testing accuracy of MLP with different training data amount. The ``Half MLP'' is trained with only 25000 training images.}
+\label{fig:mlp-half-cifar-loss}
+\end{figure}
+
 
 \subsection{Public Non-image Datasets: 20 Newsgroups}
 
