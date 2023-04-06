@@ -1,4 +1,4 @@
-\documentclass[twocolumn, draft]{extarticle}
+\documentclass[twocolumn]{extarticle}
 \usepackage{fontspec}   %加這個就可以設定字體
 \usepackage{xeCJK}       %讓中英文字體分開設置
 \usepackage{indentfirst}
@@ -37,23 +37,23 @@
 \usepackage{etoolbox}
 \setminted{fontsize=\footnotesize}
 \renewtcblisting{minted}{%
-    listing engine=minted,
-    minted language=python,
-    listing only,
-    breakable,
-    enhanced,
-    minted options = {
-        linenos, 
-        breaklines=true, 
-        breakbefore=., 
-        fontsize=\footnotesize, 
-        numbersep=2mm
-    },
-    overlay={%
-        \begin{tcbclipinterior}
-            \fill[gray!25] (frame.south west) rectangle ([xshift=4mm]frame.north west);
-        \end{tcbclipinterior}
-    }   
+	listing engine=minted,
+	minted language=python,
+	listing only,
+	breakable,
+	enhanced,
+	minted options = {
+		linenos, 
+		breaklines=true, 
+		breakbefore=., 
+		fontsize=\footnotesize, 
+		numbersep=2mm
+	},
+	overlay={%
+		\begin{tcbclipinterior}
+			\fill[gray!25] (frame.south west) rectangle ([xshift=4mm]frame.north west);
+		\end{tcbclipinterior}
+	}   
 }
 
 \usepackage[
@@ -195,7 +195,7 @@ In conclusion, ViT is 57 times larger than ResNet-18, but it only increase 7\% o
 
 From the above comparing, we know that the best performance for ResNet-18 is the modified ResNet-18 without pretrained weights. As for MLP, the best model is with 2500 hidden neurons. And the SOTA model for CIFAR-10 is ViT-H/18. 
 
-For the overall comparison table, please refer to \autoref{table: cifar-table}.
+For the overall comparison table, please refer to \autoref{tab:cifar-comp}.
 
 \subsection{Discussion}
 
@@ -256,19 +256,21 @@ Each document in the 20 Newsgroups datasets is a posting to one of the 20 newsgr
 
 In this project, I will use vectorize version of this datasets. This is done by using the \texttt{CountVectorize} in scikit-learn library. In this way, the text data is transformed to real-valued vector, which can be processed by \texttt{RandomForestClassifier}, \texttt{GradientBoostingClassifier}, \texttt{AdaBoostClassifier}, etc.
 
+As for the cross-validation, because scikit-learn has alreaday provided a train/test split, which contains 11314 train data and 7532 test data. 
+
 \subsection{Algorithms}
 
-In this datasets, I use four kinds of ensemble learning algorithms, Random Forest Classifier, Gradient Boosting Classifier, Histogram-based Gradient Boosting Classifier and AdaBoost Classifier. One SVM algorithm, linear SVM. And a MLP Classifier, which is same MLP architecture in the first datasets. Therefore, I will only talk about the four ensemble learning algorithms and the SVM algorithm.
+In this datasets, I use four kinds of ensemble learning algorithms, Random Forest Classifier, Gradient Boosting Classifier, and AdaBoost Classifier. One SVM algorithm, linear SVM. And a MLP Classifier, which is same MLP architecture in the first datasets. Therefore, I will only talk about the four ensemble learning algorithms and the SVM algorithm.
 
-Random Forest Classifier, Gradient Boosting Classifier, Histogram-based Gradient Boosting Classifier and AdaBoost Classifier are all powerful machine learning algorithms commonly used for classification tasks. These algorithms are known for their ability to handle complex datasets and provide accurate predictions.
+Random Forest Classifier, Gradient Boosting Classifier, and AdaBoost Classifier are all powerful machine learning algorithms commonly used for classification tasks. These algorithms are known for their ability to handle complex datasets and provide accurate predictions.
 
 And SVM (Support Vector Machines) is also a machine learning algorithm used for classification and regression analysis. It was developed by Vapnik and his colleagues in the 1990s. SVM is a supervised learning algorithm that works by finding the optimal hyperplane that separates the data into different classes. The hyperplane is chosen in a way that maximizes the margin between the closest data points from each class. These closest data points are known as support vectors.
 
-These six classifiers can be found in the \texttt{scikit-learn} library. In the following experiments, I directly apply the default value of \texttt{scikit-learn} provides. I state the option clearly in different classifier.
+These five classifiers can be found in the \texttt{scikit-learn} library. In the following experiments, I directly apply the default value of \texttt{scikit-learn} provides. I state the option clearly in different classifier.
 
 \subsubsection{Random Forest Classifier}
 
-Random Forest Classifier is an ensemble learning algorithm that creates multiple decision trees and combines their outputs to make a final prediction. Each tree is trained on a random subset of the features and samples of the dataset, making the algorithm robust to overfitting. The final prediction is made by taking the mode of the predictions of all trees in the forest.
+Random Forest Classifier is an ensemble learning algorithm that creates multiple decision trees and combines their outputs to make a final prediction. Each tree is trained on a random subset of the features and samples of the datasets, making the algorithm robust to overfitting. The final prediction is made by taking the mode of the predictions of all trees in the forest.
 
 \begin{itemize}
 \item The number of tree: 1000 or 500　(compare the difference)
@@ -289,28 +291,6 @@ Gradient Boosting algorithm is widely used in many machine learning competitions
 \item Max Depth: 3
 \end{itemize}
 
-\subsubsection{Histogram-based Gradient Boosting Classifier}
-
-The Histogram-based Gradient Boosting Classifier is a variation of the standard gradient boosting classifier in scikit-learn. The primary difference between the two lies in the way they handle large datasets.
-
-The traditional gradient boosting classifier typically uses the entire dataset to build the decision tree at each boosting iteration. This can be computationally expensive and slow for large datasets. In contrast, the Histogram-based Gradient Boosting Classifier uses histogram-based gradient boosting, which aggregates and precomputes information about the dataset in bins or buckets, making it more efficient for large datasets.
-
-Furthermore, the Histogram-based Gradient Boosting Classifier uses a technique called gradient-based early stopping, which allows it to automatically stop training once the model starts to overfit the training data. This is different from the traditional gradient boosting classifier which requires the user to manually specify the number of boosting iterations.
-
-Overall, while the standard gradient boosting classifier is a powerful algorithm that can produce accurate predictions, the Histogram-based Gradient Boosting Classifier is a more efficient and scalable algorithm that is particularly useful for large datasets with high dimensionality.
-
-The \texttt{scikit-learn} implementation is inspired by \href{https://github.com/Microsoft/LightGBM}{LightGBM}.
-
-\begin{itemize}
-\item Epoch: 100 or 50　(compare the difference)
-\item Loss Function: \texttt{log\_loss}
-\item Learning Rate: 0.1
-\item Maximum Leaf Nodes: 31
-\item Maximum Number of Bins: 255
-\item Tolerance: $10^{-7}$
-\item Patience: 10
-\end{itemize}
-
 \subsubsection{AdaBoost Classifier}
 
 AdaBoost Classifier, short for Adaptive Boosting Classifier, is also an ensemble learning algorithm that creates multiple weak learners and combines their outputs to make a final prediction. It is similar to Gradient Boosting Classifier in that it creates trees sequentially, but it assigns weights to each sample in the datasets based on how difficult it is to classify correctly. Samples that are misclassified by a weak learner are given higher weights, making them more likely to be correctly classified by the next weak learner.
@@ -321,7 +301,7 @@ AdaBoost Classifier, short for Adaptive Boosting Classifier, is also an ensemble
 \item Algorithm: SAMME.R
 \end{itemize}
 
-\subsubsection{Linear SVM Classifier}
+\subsubsection{Linear SVM Classifier}\label{sec: linear-svm}
 
 Linear SVM is a specific type of SVM that assumes the data is linearly separable, meaning that a straight line can be drawn to separate the data points into different classes. Linear SVM is used when the data is linearly separable, which means that the data can be classified into two or more classes by a straight line. In this case, the SVM algorithm finds the optimal hyperplane in a way that maximizes the margin between the closest data points from each class while keeping the classification error rate as low as possible.
 
@@ -352,21 +332,50 @@ Noted that this MLP Classifier is the built-in version in scikit-learn.
 \subsection{Analysis}
 
 \subsubsection{Compare Different Random Forest Classifier}
+
+As we can see in the \autoref{chart:random-forest-500-acc} to \autoref{chart:random-forest-1000-conf}, obviously, the one with more estimators has higher accuracy. However, the difference between the accuracy is not much, only 0.46\%. The accuracy random forest classifier with 1000 estimators is 74.65\%.
+
 \subsubsection{Compare Different Gradient Boosting Classifier}
-\subsubsection{Compare Different Histogram-based Gradient Boosting Classifier}
+
+As we can see in the \autoref{chart:gb-100-acc} to \autoref{chart:gb-50-conf}, the accuracy of gradient boosting classifier with 100 estimators is 70.74\%, which is higher than one that with 50 estimators.
 \subsubsection{Compare Different AdaBoost Classifier}
+
+As we can see in the \autoref{chart:ada-50-acc} to \autoref{chart:ada-500-conf}, the accuracy of Adaboost classifier with 50 estimators is 46.52\%, which is higher than one that with 500 estimators. This is not the results I expected, I will discuss about it in the discussion section.
+
+\subsubsection{Compare Different Linear SVM Classifier}
+
+As we can see in the \autoref{chart:svm-primal-acc} to \autoref{chart:svm-primal-conf}, using dual or primal optimization is actually the same for 20 newsgroups datasets. And also the accuracy of SVM is 78.47\% and AUC is 47.85\%, which is a high accuracy and AUC.
+
 \subsubsection{Compare Different MLP Classifier}
+
+As we can see in \autoref{chart:mlp-100-acc} to \autoref{chart:mlp-50-conf}, the MLP with 50 hidden neurons perform better than one that with 100 hidden neurons, with accuracy is 78.57\%. 
+
 \subsubsection{Compare Different Amount of Training Data}
+
+In this section, I will only test on the best model, which is the MLP model with 50 hidden neurons. Recall that the accuracy of linear SVM model with full train datasets is 78.57\%.
+
+As we can see in the \autoref{fig:mlp-half-acc} and \autoref{fig:mlp-half-conf}, the testing accuracy is 0.7767 which is a little bit less than the full trained one.
+
 \subsubsection{Compare with SOTA Model}
 
-Currently, to my best knowledge, the SOTA of 20 newsgroups datasets is \href{https://arxiv.org/abs/2211.02563v1}{LinearSVM+TFIDF}. TFIDF is a kind of vectorizer and LinearSVM is just a simple SVM algorithm.
+Currently, to my best knowledge, the SOTA of 20 newsgroups datasets is \href{https://arxiv.org/abs/2211.02563v1}{LinearSVM+TFIDF}. TFIDF is a kind of vectorizer and LinearSVM is the same algorithms as in \ref{sec: linear-svm}.
 
 \subsubsection{Overall Comparison}
+
+You can refer to \autoref{tab:20-news}.
+
+By this table, we know that best model is MLP model with 78.57\% test accuracy.
 
 \subsection{Discussion}
 \subsubsection{Assessing Expected Results and Behaviors in Experiments}
 
-Before conducting the experiment, I guess the Adaboost or histogram-based gradient boosting algorithm may perform pretty well. Because I heard that GB algorithms perform really well on lots of Kaggle competition. However, after the experiments, I found that the best model is simple linear SVM classifier, and it only took around 2 minutes to finished training. Compared to histogram-based gradient boosting, it takes nearly 40 minutes to binning the data, and 4.6 hours to train the model. Which is really time-consuming, and the result is not really good. This really surprised me. I will have more research on this behavior after this project.
+Before conducting the experiment, I guess the gradient boosting or Adaboost algorithm may perform pretty well. Because I heard that GB algorithms perform really well on lots of Kaggle competition. However, after the experiments, I found that the best model is simple linear SVM classifier, and it only took around 2 minutes to finished training, which is really surprising.
+
+Second, I also expect adaboost with more estimators\footnote{Estimator is actually a decision tree, which is a weak classifier. Therefore more classifier may make adaboost algorithm to overfit the training data.} would perform better. After some researching, I found that more estimators may lead to overfitting problem, which made the testing accuracy worse than the less one.
+
+Third, the MLP case is also surprised me, the 50 one perform better than the 100 one. I guess this is also because of overfitting problem. 
+
+To overcome overfitting problem, one usual strategy is using ``early-stopping''. Stopping the training process before the model becoming to be overfitted.
 
 \subsubsection{Factors Affecting Performance}
 
@@ -385,6 +394,7 @@ Before conducting the experiment, I guess the Adaboost or histogram-based gradie
 Including removing stop words, stemming, etc.
 
 \item \textbf{Try to use NLP Model like BERT}
+\item \textbf{Using early-stopping to avoid overfitting}
 \end{enumerate}
 
 \subsubsection{Findings and Open Questions from Experiments}
@@ -414,20 +424,51 @@ Because this datasets is also a image datasets, I just use the two classifiers (
 For MLP, because directly use $3 \times 256 \times 256$ as input layer is too large, I down-sampling the image from 256 x 256 to 128 x 128.
 
 \subsection{Analysis}
-\subsubsection{Compare Different Architecture of ResNet-18}
-\subsubsection{Compare Different Architecture of MLP}
-\subsubsection{Overall Comparison}
 
-\subsubsection{Compare Different Amount of Training Data}
+Because I've already conducted the experiments of comparing different architecture of the same classifier, I will only compare the difference between ResNet-18 and MLP. And also compare different amount of training data.
+
+For the validation, because this datasets is self-made datasets, I use 5-fold cross-validation to evaluate the model performance.
+
+\subsubsection{Compare ResNet-18 and MLP}
+
+As we can see in \autoref{tab:terrain-comp}, MLP outperform ResNet-19. The mean accuracy of MLP is 98.032\%. As for ResNet-18, it's 93.186\%. 
 
 \subsubsection{Compare with SOTA Model}
 
+Because this datasets is a self-made datasets, I can't compare to other models. However, there is some similar tasks, using CNN and ViT.
+
 \subsection{Discussion}
 \subsubsection{Assessing Expected Results and Behaviors in Experiments}
+
+I am actually surprised by the performance of ResNet-18, I thought it can only achieve an accuracy around 90\%. However, most of the fold can achieve 100\% of testing accuracy.
+
+Furthermore, simple MLP can even outperform ResNet-18, which is also a big surprise for me.
+
 \subsubsection{Factors Affecting Performance}
+
+\begin{enumerate}
+\item Size of datasets
+\item Different model
+\end{enumerate}
+
 \subsubsection{Future Experiments}
+
+\begin{enumerate}
+\item \textbf{More robust training and testing data}
+
+This classify problem is too simple for ResNet-18, an unmodified model can achieve near 100\% of accuracy. Therefore, I would like to introduce more data or regions to made this classify problem more challenging.
+
+\item \textbf{Optimized the model architecture}
+\item \textbf{Try to use ViT}
+
+\end{enumerate}
+
 \subsubsection{Findings and Open Questions from Experiments}
 
+\begin{enumerate}
+\item Small model may perform well
+\item Why this classification problem is that easy
+\end{enumerate}
 
 \clearpage
 \pagenumbering{arabic}% resets `page` counter to 1
@@ -550,21 +591,1554 @@ For MLP, because directly use $3 \times 256 \times 256$ as input layer is too la
 \label{fig:mlp-half-cifar-loss}
 \end{figure}
 
+\begin{table*}[h]
+\centering
+\caption{Overall Comparision of Models Trained on CIFAR-10 Datasets}
+\label{tab:cifar-comp}
+\begin{tabular}{@{}ccc@{}}
+Model                      & Feature                                       & Test Accuracy   \\ \midrule
+\multirow{3}{*}{ResNet-18} & w/ pretrained weights                         & 0.9177          \\
+                           & w/o pretrained weights                        & \textbf{0.9227} \\
+                           & w/o pretrained weights and half training size & 0.8782          \\ \midrule
+\multirow{3}{*}{MLP}       & 2500 hidden neurons                           & \textbf{0.5886} \\
+                           & 100 hidden neurons                            & 0.5324          \\
+                           & 2500 hidden neurons and half training size    & 0.5816          \\ \midrule
+ViT-H/14                   &                                               & \textbf{0.995} 
+\end{tabular}
+\end{table*}
 
 \subsection{Public Non-image Datasets: 20 Newsgroups}
 
-\subsection{Self-mad Datasets: Staellite Images of 5 Regions}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{charts/random-forest-500-acc}
+\caption{The test accuracy of each classes of the random forest classifier with 500 tress.}
+\label{chart:random-forest-500-acc}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{"charts/Random Forest 500"}
+\caption{The confusion matrix of each class of the random forest classifier with 500 tress.}
+\label{chart:random-forest-500-conf}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{charts/random-forest-1000-acc}
+\caption{The test accuracy of each class of the random forest classifier with 1000 trees.}
+\label{chart:random-forest-1000-acc}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{"charts/Random Forest 1000"}
+\caption{The confusion matrix of each class of the random forest classifier with 1000 tress.}
+\label{chart:random-forest-1000-conf}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{charts/gb-100-acc}
+\caption{The test accuracy of each class of the gradient boosting classifier with 100 estimators.}
+\label{chart:gb-100-acc}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{"charts/Gradient Boosting 100 estimators"}
+\caption{The confusion matrix of each classof the gradient boosting classifier with 100 estimators.}
+\label{chart:gb-100-conf}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{charts/gb-50-acc}
+\caption{The test accuracy of each class of the gradient boosting classifier with 50 estimators.}
+\label{chart:gb-50-acc}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{"charts/Gradient Boosting 50 estimators"}
+\caption{The confusion matrix of each class of the gradient boosting classifier with 50 estimators.}
+\label{chart:gb-50-conf}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{charts/ada-500-acc}
+\caption{The test accuracy of each class of the Adaboost classifier with 500 estimators.}
+\label{chart:ada-500-acc}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{"charts/Adaboost with 500 Estimators"}
+\caption{The confusion matrix of each class of the Adaboost classifier with 500 estimators.}
+\label{chart:ada-500-conf}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{charts/ada-50-acc}
+\caption{The test accuracy of each class of Adaboost with 50 estimators.}
+\label{chart:ada-50-acc}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{"charts/Adaboost with 50 Estimators"}
+\caption{The confusion matrix of each class of the gradient boosting classifier with 50 estimators.}
+\label{chart:ada-50-conf}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{charts/svm-primal-acc}
+\caption{The test accuracy of each class of the linear SVM classifier with primal optimization.}
+\label{chart:svm-primal-acc}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{"charts/Linear SVC with Primal Optimization"}
+\caption{The confusion matrix of each class of the linear SVM classifier with primal optimization.}
+\label{chart:svm-primal-conf}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{charts/svm-dual-acc}
+\caption{The test accuracy of each class of the linear SVM classifier with dual optimization.}
+\label{chart:svm-dual-acc}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{"charts/Linear SVC with Dual Optimization"}
+\caption{The confusion matrix of each class of the linear SVM classifier with dual optimization.}
+\label{chart:svm-dual-conf}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{charts/mlp-100-acc}
+\caption{The test accuracy of each class of the MLP classifier with 100 hidden neurons.}
+\label{chart:mlp-100-acc}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{"charts/MLP 100"}
+\caption{The confusion matrix of each class of the MLP classifier with 100 hidden neurons.}
+\label{chart:mlp-100-conf}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{charts/mlp-50-acc}
+\caption{The test accuracy of each class of the MLP classifier with 50 hidden neurons.}
+\label{fig:mlp-50-acc}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{"charts/MLP 50"}
+\caption{The confusion matrix of each class of the MLP classifier with 50 hidden neurons.}
+\label{chart:mlp-50-conf}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.9\linewidth]{charts/mlp-half-acc}
+\caption{The test accuracy of each class of the MLP classifier with 50 hidden neurons and half training data size.}
+\label{fig:mlp-half-acc}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.9\linewidth]{"charts/MLP 50 Half"}
+\caption{The confusion matrix of each class of the MLP classifier with 50 hidden neurons and half training data size.}
+\label{fig:mlp-half-conf}
+\end{figure}
+
+
+\begin{table*}[h]
+\centering
+\caption{Overall Comparision of Models Trained on 20 Newsgroups Datasets}
+\label{tab:20-news}
+\begin{tabular}{@{}ccccccc@{}}
+Model                              & Feature                          & Test Accuracy   & AUC             & Precision     & Recall        & F1-Score      \\ \midrule
+\multirow{2}{*}{Random Forest}     & 500 esimators                    & 0.7419          & \textbf{0.5075} & 0.73          & 0.75          & 0.72          \\
+                                   & 1000 estimators                  & 0.7465          & 0.5039          & 0.73          & 0.76          & 0.73          \\ \midrule
+\multirow{2}{*}{Gradient Boosting} & 50 estimators                    & 0.6929          & 0.5058          & 0.68          & 0.73          & 0.70          \\
+                                   & 100 estimators                   & 0.7074          & 0.5034          & 0.70          & 0.74          & 0.71          \\ \midrule
+\multirow{2}{*}{Adaboost}          & 50 esimators                     & 0.4652          & 0.5060          & 0.46          & 0.65          & 0.50          \\
+                                   & 500 esimators                    & 0.3952          & 0.4893          & 0.39          & 0.44          & 0.41          \\ \midrule
+\multirow{2}{*}{Linear SVM}        & Primal Optimization              & 0.7847          & 0.4785          & \textbf{0.78} & \textbf{0.78} & 0.77          \\
+                                   & Dual Optimization                & 0.7847          & 0.4785          & \textbf{0.78} & \textbf{0.78} & 0.77          \\ \midrule
+\multirow{3}{*}{MLP}               & 50 neurons                       & \textbf{0.7857} & 0.4832          & \textbf{0.78} & \textbf{0.78} & \textbf{0.78} \\
+                                   & 50 neurons w/ half training data & 0.7767          & 0.4883          & 0.77          & 0.77          & 0.77          \\
+                                   & 100 neurons                      & 0.7820          & 0.4820          & 0.77          & 0.78          & 0.77         
+\end{tabular}
+\end{table*}
+
+
+
+
+
+\subsection{Self-made Datasets: Satellite Images of 5 Regions}
+
+\begin{table}[H]
+\centering
+\caption{The 5-fold test accuracy for ResNet-18 and MLP. Can see that MLP has better test accuracy.}
+\label{tab:terrain-comp}
+\begin{tabular}{@{}cccc@{}}
+\toprule
+Model                      & Fold & Test Accuracy & Mean Accuracy            \\ \midrule
+\multirow{5}{*}{MLP}       & 1    & 1.0           & \multirow{5}{*}{\textbf{0.98032}} \\
+                           & 2    & 1.0           &                          \\
+                           & 3    & 0.9094        &                          \\
+                           & 4    & 0.9969        &                          \\
+                           & 5    & 0.9953        &                          \\ \midrule
+\multirow{5}{*}{ResNet-18} & 1    & 0.8375        & \multirow{5}{*}{0.93186} \\
+                           & 2    & 0.9703        &                          \\
+                           & 3    & 0.9703        &                          \\
+                           & 4    & 1.0           &                          \\
+                           & 5    & 0.8812        &                          \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\section{Some Note about the Python Scripts}
+
+Because I'm using jupyter notebook for training and testing, the code below is actually the content of a jupyter notebook. Therefore, it can't be directly execute as an python code. Each \texttt{\# In[...]: } is the beginning of a cell. Each cell should be execute independently and the execution order of cell is not determine by the order.
 
 \section{Code of CIFAR-10}
-\subsection{Training ResNet-18}
-\subsection{Training MLP}
+
+\begin{code}
+\captionof{listing}{Training and Testing of CIFAR-10}
+\label{code:cifar-10}
+\begin{minted}
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+import torch.backends.cudnn as cudnn
+
+import torchvision as tv
+import torchvision.transforms as transforms
+
+import wandb
+
+import os
+import numpy as np
+
+from tqdm import *
+
+
+# In[2]:
+
+
+wandb.login()
+
+
+# In[3]:
+
+
+lr = 0.1
+best_acc = 0.0
+start_epoch = 0
+
+
+# In[ ]:
+
+
+
+
+
+# In[4]:
+
+
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+
+# In[5]:
+
+
+# Transforms 
+
+transform_train = transforms.Compose([
+    transforms.RandomCrop(32, padding=4),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+])
+
+transform_test = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+])
+
+
+# In[6]:
+
+
+# Datasets
+train_dataset = tv.datasets.CIFAR10(root='./datasets', train=True, transform=transform_train, download=True)
+train_dataset_half = torch.utils.data.random_split(train_dataset, [25000, 25000])[0]
+test_dataset = tv.datasets.CIFAR10(root='./datasets', train=False, transform=transform_test, download=True)
+
+# Data loader
+train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=128, shuffle=True, num_workers=35)
+train_loader_half = torch.utils.data.DataLoader(dataset=train_dataset_half, batch_size=128, shuffle=True, num_workers=35)
+test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=128, shuffle=False, num_workers=35)
+
+
+# In[8]:
+
+
+print(len(train_dataset))
+print(len(test_dataset))
+print(len(train_dataset_half))
+
+
+# In[9]:
+
+
+# Define Model
+net = tv.models.resnet18(pretrained=True)
+net.fc = nn.Linear(in_features=512, out_features=10, bias=True)
+
+net.conv1 = nn.Conv2d(3, 64, kernel_size=(3, 3), stride=(2, 2), padding=(3, 3), bias=False)
+net.maxpool = nn.Identity()
+
+
+# In[26]:
+
+
+class MLP(nn.Module):
+    def __init__(self, n_hidden_nodes):
+        super(MLP, self).__init__()
+        self.n_hidden_nodes = n_hidden_nodes
+        # Set up perceptron layers and add dropout
+        self.fc1 = nn.Linear(3 * 32 * 32,
+                                   n_hidden_nodes)
+        self.fc1_drop = nn.Dropout(0.2)
+        self.fc2 = nn.Linear(n_hidden_nodes, n_hidden_nodes)
+        self.fc2_drop = nn.Dropout(0.2)
+        self.out = nn.Linear(n_hidden_nodes, 10)
+
+    def forward(self, x):
+        x = x.view(-1, 3 * 32 * 32)
+        x = self.fc1(x)
+        x = F.relu(x)
+        x = self.fc1_drop(x)
+        x = self.fc2(x)
+        x = F.relu(x)
+        x = self.fc2_drop(x)
+        return self.out(x)
+    
+net = MLP(100)
+
+
+# In[10]:
+
+
+net = net.to(device)
+
+
+# In[11]:
+
+
+lr = 0.1
+best_acc = 0.0
+start_epoch = 0
+
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.SGD(net.parameters(), lr=lr,
+                      momentum=0.9, weight_decay=5e-4, nesterov=True)
+# scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
+
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.1, patience=10, 
+                                                       threshold=0.001, mode="max") 
+
+wandb.init(
+    project="AI Capstone Project 1",
+    config = {
+        "lr": 0.1,
+        "arch": "resnet18",
+        "dataset": "CIFAR-10",
+        "epochs": 200,
+        "patient": 10,
+        "pretrained": True,
+        "training data": 25000
+    }
+)
+
+# Training
+def train(epoch):
+    print('\nEpoch: %d' % epoch)
+    net.train()
+    train_loss = 0
+    correct = 0
+    total = 0
+    for batch_idx, (inputs, targets) in tqdm(enumerate(train_loader_half)):
+        inputs, targets = inputs.to(device), targets.to(device)
+        optimizer.zero_grad()
+        outputs = net(inputs)
+        loss = criterion(outputs, targets)
+        loss.backward()
+        optimizer.step()
+
+        train_loss += loss.item()
+        _, predicted = outputs.max(1)
+        total += targets.size(0)
+        correct += predicted.eq(targets).sum().item()
+        
+    wandb.log({
+        "epoch": epoch,
+        "train_loss": train_loss,
+        "train_acc": 1.*correct/total,
+        "lr": scheduler.optimizer.param_groups[0]['lr'],
+    })
+        
+    
+
+
+def test(epoch):
+    global best_acc
+    net.eval()
+    test_loss = 0
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for batch_idx, (inputs, targets) in tqdm(enumerate(test_loader)):
+            inputs, targets = inputs.to(device), targets.to(device)
+            outputs = net(inputs)
+            loss = criterion(outputs, targets)
+
+            test_loss += loss.item()
+            _, predicted = outputs.max(1)
+            total += targets.size(0)
+            correct += predicted.eq(targets).sum().item()
+
+#             progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+#                          % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
+
+    # Save checkpoint.
+    acc = 1.*correct/total
+    wandb.log({
+        "epoch": epoch,
+        "test_loss": test_loss,
+        "test_acc": acc,
+    })
+    if acc > best_acc:
+        print('Saving..')
+        state = {
+            'net': net.state_dict(),
+            'acc': acc,
+            'epoch': epoch,
+        }
+        if not os.path.isdir('checkpoint'):
+            os.mkdir('checkpoint')
+        torch.save(state, './checkpoint/ckpt.pth')
+        wandb.save('./checkpoint/ckpt.pth')
+        best_acc = acc
+    scheduler.step(acc)
+
+
+for epoch in range(start_epoch, start_epoch+200):
+    train(epoch)
+    test(epoch)
+    print(best_acc)
+    
+
+
+# In[30]:
+
+
+wandb.finish()
+
+
+# In[16]:
+
+
+best_model = wandb.restore('checkpoint/ckpt.pth', run_path="jayinnn/AI Capstone Project 1/1zzr5u3j")
+print(best_model)
+
+
+# In[26]:
+
+
+net = net.to("cpu")
+net.load_state_dict(torch.load("checkpoint/half-resnet.pth")["net"])
+net.eval()
+
+
+# In[97]:
+
+
+from sklearn import metrics
+from sklearn.metrics import *
+import matplotlib.pyplot as plt
+import itertools
+
+def plot_training_metrics(model, y_actual, y_pred, classes, model_name='model'):
+    """
+    Input: trained model history, model, test image generator, actual and predicted labels, class list
+    Output: Plots loss vs epochs, accuracy vs epochs, confusion matrix
+    """
+    fpr, tpr, thresholds = metrics.roc_curve(y_actual, y_pred, pos_label=9)
+    AUC       = metrics.auc(fpr, tpr)*100
+    Acc       = metrics.accuracy_score(y_actual, y_pred)*100 
+    results_title =(f"\n Model AUC {AUC:.2f}%, Accuracy {Acc:.2f}% on Test Data\n")
+    print(results_title.format(AUC, Acc))
+
+    
+    # print classification report
+    print(classification_report(y_actual, y_pred, target_names=classes))
+
+
+    plt.subplots(figsize=(12,12))
+    
+
+
+    
+     # calculate Confusion Matrix
+    cm = confusion_matrix(y_actual, y_pred)
+
+    # create confusion matrix plot
+    plt.imshow(cm, interpolation='nearest', cmap=plt.cm.BuPu)
+    plt.title(f"{model_name} Confusion Matrix \nAUC: {AUC:.2f}%")
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+
+    # loop through matrix, plot each 
+    threshold = cm.max() / 2.
+    for r, c in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(c, r, format(cm[r, c], 'd'),
+                 horizontalalignment="center",
+                 color="white" if cm[r, c] > threshold else "black")
+
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    plt.tight_layout()
+    plt.savefig(f"{model_name}.pdf")
+
+    plt.show()
+
+def accuracy(predicted, actual):
+    _, predictions = torch.max(predicted, dim=1)
+    return torch.tensor(torch.sum(predictions==actual).item()/len(predictions))
+    
+@torch.no_grad()
+def get_all(model, loader):
+    all_preds = torch.tensor([])
+    all_truths = torch.tensor([])
+    for batch in loader:
+        images, labels = batch
+
+        preds = model(images)
+        all_preds = torch.cat((all_preds, preds) ,dim=0)
+        all_truths = torch.cat((all_truths, labels), dim=0)
+
+    return all_preds, all_truths
+
+
+# In[91]:
+
+
+net = net.to("cpu")
+net.load_state_dict(torch.load("checkpoint/resnet18-cifar.pth")["net"])
+net.eval()
+
+
+# In[92]:
+
+
+y_pred, y_truth = get_all(net, test_loader)
+
+
+# In[63]:
+
+
+classes = '''airplane automobile bird cat deer dog frog horse ship truck'''.split()
+
+
+# In[93]:
+
+
+_, y_pred_one = y_pred.max(1)
+
+
+# In[77]:
+
+
+print(y_pred_one)
+
+
+# In[98]:
+
+
+plot_training_metrics(net, y_truth, y_pred_one, classes, model_name="Pretrained ResNet-18")
+
+\end{minted}
+\end{code}
+
 \section{Code of 20 Newsgroups}
-\subsection{Training Random Forest Classifier}
-\subsection{Training Gradient Boosting Classifier}
-\subsection{Training AdaBoost Classifier}
-\subsection{Training MLP Classifier}
+
+\begin{code}
+\captionof{listing}{Training and Testing of 20 Newsgroups}
+\label{code:20-news}
+\begin{minted}
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[107]:
+
+
+from sklearn.datasets import fetch_20newsgroups, fetch_20newsgroups_vectorized
+from sklearn.linear_model import Perceptron
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
+from sklearn.neural_network import MLPClassifier
+
+
+# In[18]:
+
+
+train_x, train_y = fetch_20newsgroups_vectorized(
+    data_home='./datasets', 
+    subset="train", 
+    return_X_y=True, 
+    remove=("headers")
+)
+
+
+# In[22]:
+
+
+test_x, test_y = fetch_20newsgroups_vectorized(
+    data_home='./datasets', 
+    subset="test", 
+    return_X_y=True, 
+    remove=("headers")
+)
+
+
+# In[19]:
+
+
+train_x
+
+
+# In[118]:
+
+
+print(len(train_y))
+print(len(test_y))
+
+
+# In[84]:
+
+
+perc = Perceptron(
+    max_iter = 2000,
+    n_jobs = 30,
+    validation_fraction = 0.1,
+    n_iter_no_change = 2000,
+)
+perc.fit(train_x, train_y)
+
+
+# In[95]:
+
+
+plot_training_metrics(perc.predict(test_x), test_y, classes, model_name="Perceptron")
+
+
+# In[85]:
+
+
+rf = RandomForestClassifier(
+    n_jobs = 30,
+    verbose = 1,
+    n_estimators=1000,
+)
+rf.fit(train_x, train_y)
+
+
+# In[100]:
+
+
+rf500 = RandomForestClassifier(
+    n_jobs = 30,
+    verbose = 1,
+    n_estimators=500,
+)
+rf500.fit(train_x, train_y)
+
+
+# In[113]:
+
+
+plot_training_metrics(rf.predict(test_x), test_y, classes, model_name="Random Forest 1000")
+
+
+# In[106]:
+
+
+plot_training_metrics(rf500.predict(test_x), test_y, classes, model_name="Random Forest 500")
+
+
+# In[87]:
+
+
+gb = GradientBoostingClassifier(
+    verbose = 1,
+    n_estimators=100,
+)
+gb.fit(train_x, train_y)
+
+
+# In[99]:
+
+
+gb50 = GradientBoostingClassifier(
+    verbose = 1,
+    n_estimators=50,
+)
+gb50.fit(train_x, train_y)
+
+
+# In[116]:
+
+
+plot_training_metrics(gb50.predict(test_x), test_y, classes, model_name="Gradient Boosting 50 estimators")
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+mlp = MLPClassifier(
+    hidden_layer_sizes=(100),
+    verbose=True
+) 
+
+
+# In[68]:
+
+
+mlp.fit(train_x, train_y)
+
+
+# In[134]:
+
+
+mlp50 = MLPClassifier(
+    hidden_layer_sizes=(50),
+    verbose=True
+)
+mlp50.fit(train_x, train_y)
+
+
+# In[141]:
+
+
+train_x_half, _, train_y_half, _ = sklearn.model_selection.train_test_split(train_x, train_y, random_state=42)
+
+
+# In[139]:
+
+
+train_x_half
+
+
+# In[ ]:
+
+
+mlp50_half = mlp50 = MLPClassifier(
+    hidden_layer_sizes=(50),
+    verbose=True
+)
+mlp50_half.fit(train_x_half, train_y_half)
+
+
+# In[135]:
+
+
+plot_training_metrics(mlp50_half.predict(test_x), test_y, classes, model_name="MLP 50 Half")
+
+
+# In[129]:
+
+
+from sklearn.svm import LinearSVC
+
+linearsvc = LinearSVC(
+    verbose = 1,
+    dual=True,
+)
+
+linearsvc.fit(train_x, train_y)
+
+
+# In[126]:
+
+
+from sklearn.cross_validation import train_test_split
+
+
+# In[130]:
+
+
+plot_training_metrics(linearsvc.predict(test_x), test_y, classes, model_name="Linear SVC with Dual Optimization")
+
+
+# In[80]:
+
+
+from sklearn.metrics import f1_score, confusion_matrix, classification_report
+
+
+# In[ ]:
+
+
+
+
+
+# In[111]:
+
+
+ada = AdaBoostClassifier(
+    n_estimators=500
+)
+ada.fit(train_x, train_y)
+
+
+# In[119]:
+
+
+ada50 = AdaBoostClassifier(
+    n_estimators=50
+)
+ada50.fit(train_x, train_y)
+
+
+# In[133]:
+
+
+plot_training_metrics(ada50.predict(test_x), test_y, classes, model_name="Adaboost with 50 Estimators")
+
+
+# In[ ]:
+
+
+model = HistGradientBoostingClassifier()
+
+
+# In[58]:
+
+
+model.fit(train_x, train_y)
+
+
+# In[59]:
+
+
+model.score(test_x, test_y)
+
+
+# In[91]:
+
+
+classes = fetch_20newsgroups_vectorized(
+    data_home='./datasets', 
+    subset="test", 
+    remove=("headers")
+)["target_names"]
+
+
+# In[92]:
+
+
+classes
+
+
+# In[94]:
+
+
+from sklearn import metrics
+from sklearn.metrics import *
+import matplotlib.pyplot as plt
+import itertools
+import numpy as np
+
+def plot_training_metrics(y_actual, y_pred, classes, model_name='model'):
+    """
+    Input: trained model history, model, test image generator, actual and predicted labels, class list
+    Output: Plots loss vs epochs, accuracy vs epochs, confusion matrix
+    """
+    fpr, tpr, thresholds = metrics.roc_curve(y_actual, y_pred, pos_label=9)
+    AUC       = metrics.auc(fpr, tpr)*100
+    Acc       = metrics.accuracy_score(y_actual, y_pred)*100 
+    results_title =(f"\n Model AUC {AUC:.2f}%, Accuracy {Acc:.2f}% on Test Data\n")
+    print(results_title.format(AUC, Acc))
+
+    
+    # print classification report
+    print(classification_report(y_actual, y_pred, target_names=classes))
+
+
+    
+#     # create plots
+    plt.subplots(figsize=(12,12))
+    
+
+    
+     # calculate Confusion Matrix
+    cm = confusion_matrix(y_actual, y_pred)
+
+    # create confusion matrix plot
+#     plt.subplot(1,3,3)
+    plt.imshow(cm, interpolation='nearest', cmap=plt.cm.BuPu)
+    plt.title(f"{model_name} Confusion Matrix \nAUC: {AUC:.2f}%")
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+
+    # loop through matrix, plot each 
+    threshold = cm.max() / 2.
+    for r, c in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(c, r, format(cm[r, c], 'd'),
+                 horizontalalignment="center",
+                 color="white" if cm[r, c] > threshold else "black")
+
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    plt.tight_layout()
+    plt.savefig(f"{model_name}.pdf")
+
+    plt.show()
+
+def accuracy(predicted, actual):
+    _, predictions = torch.max(predicted, dim=1)
+    return torch.tensor(torch.sum(predictions==actual).item()/len(predictions))
+    
+def get_all(model, loader):
+    all_preds = torch.tensor([])
+    all_truths = torch.tensor([])
+    for batch in loader:
+        images, labels = batch
+
+        preds = model(images)
+        all_preds = torch.cat((all_preds, preds) ,dim=0)
+        all_truths = torch.cat((all_truths, labels), dim=0)
+
+    return all_preds, all_truths
+\end{minted}
+\end{code}
 \section{Code of Satellite Image Datasets}
-\subsection{Collect the Images}
+
+\begin{code}
+\captionof{listing}{Collecting Satellite Image Datasets}
+\label{code:collect}
+\begin{minted}
+import math
+import urllib.request
+import os
+import glob
+import subprocess
+import shutil
+# import requests
+from tqdm import tqdm
+
+# from fp.fp import FreeProxy
+from tile_convert import bbox_to_xyz, tile_edges
+from osgeo import gdal
+
+
+
+
+
+def download_tile(x, y, z, tile_server):
+    url = tile_server.replace(
+        "{x}", str(x)).replace(
+        "{y}", str(y)).replace(
+        "{z}", str(z))
+    path = '{}/{}_{}_{}.jpg'.format(temp_dir, x, y, z)
+    if(os.path.isfile(path)):
+        return path
+    # print("getting proxy")
+    # proxies = {"http": FreeProxy(rand=True).get()}
+    # proxy = urllib.request.ProxyHandler(pro)
+    # opener = urllib.request.build_opener(proxy)
+    # urllib.request.install_opener(opener)
+    # print(proxies)
+    # r = requests.get(url)
+    # print(path)
+    # print(r.content)
+    # with open(path, 'wb') as f:
+        # f.write(r.content)
+    urllib.request.urlretrieve(url, path)
+    return(path)
+
+
+def merge_tiles(input_pattern, output_path):
+    merge_command = ['gdal_merge.py', '-o', output_path]
+
+    for name in glob.glob(input_pattern):
+        merge_command.append(name)
+
+    subprocess.call(merge_command)
+
+
+def georeference_raster_tile(x, y, z, path):
+    bounds = tile_edges(x, y, z)
+    filename, extension = os.path.splitext(path)
+    gdal.Translate(filename + '.tif',
+                   path,
+                   outputSRS='EPSG:4326',
+                   outputBounds=bounds)
+
+def crop(input, output, lat, lon):
+    gdal.Translate(
+        output,
+        input,
+        outputSRS='EPSG:4326',
+        projWin=[lon, lat+1, lon+1, lat]
+    )
+
+taiwan = [
+    (23, 120),
+    (23, 121),
+    (24, 121)
+]
+
+china = [
+    (26, 101),
+    (26, 100),
+    (26, 99),
+    (26, 98),
+    (29, 101),
+    (29, 100),
+    (29, 99),
+    (28, 101),
+    (28, 100),
+    (28, 99),
+    (28, 98),
+    (27, 101),
+    (27, 100)
+]
+
+hima = [
+    (29, 81),
+    (29, 82),
+    (29, 83),
+    (28, 83),
+    (28, 84),
+    (28, 85),
+    (27, 85),
+    (27, 86),
+    (28, 86),
+    (27, 87)
+]
+
+arge = [
+    (-48, -74),
+    (-49, -74),
+    (-49, -75),
+    (-50, -74),
+    (-50, -75),
+    (-51, -73),
+    (-51, -74),
+    (-51, -75),
+    (-52, -74),
+]
+
+cana = [
+    (58, -134),
+    (57, -133),
+    (56, -132),
+    (56, -131),
+    (55, -131),
+]
+
+#---------- CONFIGURATION -----------#
+# tile_server = "https://mt0.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
+region = "cana"
+tile_server = f"https://api.maptiler.com/tiles/satellite/{z}/{x}/{y}.jpg?key={key}"
+temp_dir = os.path.join(os.path.dirname(__file__), 'temp/'+region)
+output_dir = os.path.join(os.path.dirname(__file__), 'output/'+region)
+zoom = 15
+
+# lon_max = 122
+# lat_max = 25
+#-----------------------------------#
+for lat_min, lon_min in cana:
+    print(lat_min, lon_min)
+
+    lat_dir = ("N" if lat_min > 0 else "S")
+    lon_dir = ("E" if lon_min > 0 else "W")
+
+    lat_max = lat_min + 1
+    lon_max = lon_min + 1
+    x_min, x_max, y_min, y_max = bbox_to_xyz(
+        lon_min, lon_max, lat_min, lat_max, zoom)
+
+    print("Downloading {} tiles".format((x_max - x_min + 1) * (y_max - y_min + 1)))
+
+    pbar = tqdm(total=(x_max - x_min + 1) * (y_max - y_min + 1))
+    for x in range(x_min, x_max + 1):
+        for y in range(y_min, y_max + 1):
+            # print("{},{}".format(x, y))
+            pbar.update(1)
+            pbar.set_description("{},{}".format(x, y))
+            png_path = download_tile(x, y, zoom, tile_server)
+            georeference_raster_tile(x, y, zoom, png_path)
+
+    pbar.close()
+    print("Download complete")
+
+    print("Merging tiles")
+    merge_tiles(temp_dir + '/*.tif', output_dir + '/{}{}{}{}_{}.tif'.format(lat_dir, abs(lat_min), lon_dir, abs(lon_min), zoom))
+    print("Merge complete")
+
+    print("Croping")
+    
+    crop(
+        output_dir + '/{}{}{}{}_{}.tif'.format(lat_dir, abs(lat_min), lon_dir, abs(lon_min), zoom), 
+        output_dir + '{}{}{}{}_{}_final_sat.tif'.format(lat_dir, abs(lat_min), lon_dir, abs(lon_min), zoom), 
+        lat_min, 
+        lon_min
+    )
+    print("Crop complete")
+
+
+    shutil.rmtree(temp_dir)
+    os.makedirs(temp_dir)
+\end{minted}
+\end{code}
+
+\begin{code}
+\captionof{listing}{Training and Testing of Terrain Datasets}
+\label{code:terrain}
+\begin{minted}
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[5]:
+
+
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+import torch.backends.cudnn as cudnn
+
+import torchvision as tv
+import torchvision.transforms as transforms
+
+from sklearn.model_selection import KFold
+
+import wandb
+
+import os
+import numpy as np
+
+from tqdm import *
+
+
+# In[6]:
+
+
+import wandb
+wandb.login()
+
+
+# In[7]:
+
+
+lr = 0.1
+best_acc = 0.0
+start_epoch = 0
+
+
+# In[8]:
+
+
+device = 'cuda:1' if torch.cuda.is_available() else 'cpu'
+
+
+# In[53]:
+
+
+# Transforms 
+
+transform_train = transforms.Compose([
+    transforms.Resize((128, 128)),
+    # transforms.RandomCrop(32, padding=4),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.2, 0.2, 0.2)),
+])
+
+transform_test = transforms.Compose([
+    transforms.Resize((128, 128)),
+    transforms.ToTensor(),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.2, 0.2, 0.2)),
+])
+
+
+# In[54]:
+
+
+train_dataset = tv.datasets.ImageFolder(root='./datasets/terrain_train', transform=transform_train)
+test_dataset = tv.datasets.ImageFolder(root='./datasets/terrain_test', transform=transform_test)
+
+train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=8, shuffle=True, num_workers=35)
+test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=8, shuffle=False, num_workers=35)
+
+
+# In[51]:
+
+
+datasets = torch.utils.data.ConcatDataset([train_dataset, test_dataset])
+datasets_half = torch.utils.data.random_split(datasets, [1600, 1600])[0]
+
+
+# In[34]:
+
+
+print(len(datasets))
+
+
+# In[22]:
+
+
+print(len(train_dataset))
+print(len(test_dataset))
+
+
+# In[30]:
+
+
+# Define Model
+# net = timm.create_model("hf_hub:edadaltocg/resnet18_cifar10")
+net = tv.models.resnet18(pretrained=False)
+net.fc = nn.Linear(in_features=512, out_features=5, bias=True)
+
+# net.conv1 = nn.Conv2d(3, 64, kernel_size=(3, 3), stride=(2, 2), padding=(3, 3), bias=False)
+# net.maxpool = nn.Identity()
+net = net.to(device)
+
+
+# In[55]:
+
+
+class MLP(nn.Module):
+    def __init__(self, n_hidden_nodes):
+        super(MLP, self).__init__()
+        self.n_hidden_nodes = n_hidden_nodes
+        # Set up perceptron layers and add dropout
+        self.fc1 = nn.Linear(3 * 128 * 128,
+                                   n_hidden_nodes)
+        self.fc1_drop = nn.Dropout(0.2)
+        self.fc2 = nn.Linear(n_hidden_nodes, n_hidden_nodes)
+        self.fc2_drop = nn.Dropout(0.2)
+        self.out = nn.Linear(n_hidden_nodes, 5)
+
+    def forward(self, x):
+        x = x.view(-1, 3 * 128 * 128)
+        x = self.fc1(x)
+        x = F.relu(x)
+        x = self.fc1_drop(x)
+        x = self.fc2(x)
+        x = F.relu(x)
+        x = self.fc2_drop(x)
+        return self.out(x)
+    
+net = MLP(200)
+
+
+# In[56]:
+
+
+net = net.to(device)
+
+
+# In[24]:
+
+
+lr = 0.1
+best_acc = 0.0
+start_epoch = 0
+
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.SGD(net.parameters(), lr=lr,
+                      momentum=0.9, weight_decay=5e-4, nesterov=True)
+# scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
+
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.1, patience=10, 
+                                                       threshold=0.001, mode="max") 
+
+wandb.init(
+    project="AI Capstone Project 1",
+    config = {
+        "lr": 0.1,
+        "arch": "mlp",
+        "dataset": "terrain",
+        "hidden_nodes": 1000,
+        "epochs": 200,
+        "patient": 10,
+    }
+)
+
+
+# Training
+def train(epoch):
+    print('\nEpoch: %d' % epoch)
+    net.train()
+    train_loss = 0
+    correct = 0
+    total = 0
+    for batch_idx, (inputs, targets) in tqdm(enumerate(train_loader)):
+        inputs, targets = inputs.to(device), targets.to(device)
+        optimizer.zero_grad()
+        outputs = net(inputs)
+        loss = criterion(outputs, targets)
+        loss.backward()
+        optimizer.step()
+
+        train_loss += loss.item()
+        _, predicted = outputs.max(1)
+        total += targets.size(0)
+        correct += predicted.eq(targets).sum().item()
+        
+    wandb.log({
+        "epoch": epoch,
+        "train_loss": train_loss,
+        "train_acc": 1.*correct/total,
+        "lr": scheduler.optimizer.param_groups[0]['lr'],
+    })
+        
+    
+def test(epoch):
+    global best_acc
+    net.eval()
+    test_loss = 0
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for batch_idx, (inputs, targets) in tqdm(enumerate(test_loader)):
+            inputs, targets = inputs.to(device), targets.to(device)
+            outputs = net(inputs)
+            loss = criterion(outputs, targets)
+
+            test_loss += loss.item()
+            _, predicted = outputs.max(1)
+            total += targets.size(0)
+            correct += predicted.eq(targets).sum().item()
+
+#             progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+#                          % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
+
+    # Save checkpoint.
+    acc = 1.*correct/total
+    wandb.log({
+        "epoch": epoch,
+        "test_loss": test_loss,
+        "test_acc": acc,
+    })
+    if acc > best_acc:
+        print('Saving..')
+        state = {
+            'net': net.state_dict(),
+            'acc': acc,
+            'epoch': epoch,
+        }
+        if not os.path.isdir('checkpoint'):
+            os.mkdir('checkpoint')
+        torch.save(state, './checkpoint/ckpt.pth')
+        wandb.save('./checkpoint/ckpt.pth')
+        best_acc = acc
+    scheduler.step(acc)
+
+
+for epoch in range(start_epoch, start_epoch+200):
+    train(epoch)
+    test(epoch)
+    print(best_acc)
+    
+
+
+# In[31]:
+
+
+split = KFold(n_splits=5,shuffle=True,random_state=42)
+
+
+# In[45]:
+
+
+criterion = nn.CrossEntropyLoss()
+# optimizer = optim.SGD(net.parameters(), lr=lr,
+#                       momentum=0.9, weight_decay=5e-4, nesterov=True)
+optimizer = optim.Adam(net.parameters())
+# scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
+
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.1, patience=10, 
+                                                       threshold=0.001, mode="max") 
+
+def train(epoch, fold):
+    print('\nEpoch: %d' % epoch)
+    net.train()
+    train_loss = 0
+    correct = 0
+    total = 0
+    for batch_idx, (inputs, targets) in tqdm(enumerate(train_loader)):
+        inputs, targets = inputs.to(device), targets.to(device)
+        optimizer.zero_grad()
+        outputs = net(inputs)
+        loss = criterion(outputs, targets)
+        loss.backward()
+        optimizer.step()
+
+        train_loss += loss.item()
+        _, predicted = outputs.max(1)
+        total += targets.size(0)
+        correct += predicted.eq(targets).sum().item()
+        
+    wandb.log({
+        "epoch": epoch,
+        "train_loss": train_loss,
+        "train_acc": 1.*correct/total,
+        # "lr": scheduler.optimizer.param_groups[0]['lr'],
+    })
+        
+    
+
+
+def test(epoch, fold):
+    global best_acc
+    net.eval()
+    test_loss = 0
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for batch_idx, (inputs, targets) in tqdm(enumerate(test_loader)):
+            inputs, targets = inputs.to(device), targets.to(device)
+            outputs = net(inputs)
+            loss = criterion(outputs, targets)
+
+            test_loss += loss.item()
+            _, predicted = outputs.max(1)
+            total += targets.size(0)
+            correct += predicted.eq(targets).sum().item()
+
+#             progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+#                          % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
+
+    # Save checkpoint.
+    acc = 1.*correct/total
+    wandb.log({
+        "epoch": epoch,
+        "test_loss": test_loss,
+        "test_acc": acc,
+    })
+    if acc > best_acc:
+        print('Saving..')
+        state = {
+            'net': net.state_dict(),
+            'acc': acc,
+            'epoch': epoch,
+        }
+        if not os.path.isdir('checkpoint'):
+            os.mkdir('checkpoint')
+        torch.save(state, f'./checkpoint/hand_{fold}.pth')
+        wandb.save(f'./checkpoint/hand_{fold}.pth')
+        best_acc = acc
+    # scheduler.step(acc)
+
+
+# In[ ]:
+
+
+for fold, (train_idx, test_idx) in enumerate(split.split(np.arange(len(datasets)))):
+    print(len(train_idx), len(test_idx))
+    train_sampler = torch.utils.data.SubsetRandomSampler(train_idx)
+    test_sampler = torch.utils.data.SubsetRandomSampler(test_idx)
+    train_loader = torch.utils.data.DataLoader(datasets, num_workers=5, sampler=train_sampler, batch_size=128)
+    test_loader = torch.utils.data.DataLoader(datasets, num_workers=5, sampler=test_sampler, batch_size=128)
+    lr = 0.1
+    best_acc = 0.0
+    start_epoch = 0
+    
+
+    # optimizer = optim.SGD(net.parameters(), lr=lr,
+    #                  momentum=0.9, weight_decay=5e-4, nesterov=True)
+    # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
+
+    # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.1, patience=10, 
+    #                                                        threshold=0.001, mode="max") 
+    
+    net = tv.models.resnet18(pretrained=False)
+    net.fc = nn.Linear(in_features=512, out_features=5, bias=True)
+
+#     net.conv1 = nn.Conv2d(3, 64, kernel_size=(3, 3), stride=(2, 2), padding=(3, 3), bias=False)
+#     net.maxpool = nn.Identity()
+    net = net.to(device)
+    
+    
+     # optimizer = optim.SGD(net.parameters(), lr=lr,
+    #                  momentum=0.9, weight_decay=5e-4, nesterov=True)
+    # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
+
+    # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.1, patience=10, 
+    #                                                        threshold=0.001, mode="max") 
+    optimizer = optim.Adam(net.parameters())
+    
+    
+    wandb.init(
+        project="AI Capstone Project 1",
+        config = {
+            "lr": 1e-4,
+            "arch": "mlp_kfold",
+            "dataset": "terrain",
+            "epochs": 200,
+            "fold": fold+1,
+        },
+    )
+    print(f"========== Fold {fold+1} ==========")
+
+    
+    for epoch in range(start_epoch, start_epoch+60):
+        train(epoch, fold)
+        test(epoch, fold)
+        print(best_acc)
+        
+    del train_loader
+    del test_loader
+        
+    wandb.finish()
+\end{minted}
+\end{code}
+
 \end{appendices}
 
 \end{document}
