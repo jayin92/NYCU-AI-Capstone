@@ -7,10 +7,15 @@
 #include <random>
 #include <algorithm>
 #include <map>
-
+#include <string>
 
 using namespace std;
 
+const int id = 110550088;
+int T = 5500;
+double c = 0.35;
+
+std::random_device rd;
 
 /*
     input position (x,y) and direction
@@ -125,6 +130,7 @@ vector<vector<int>> get_legal_moves(const int mapStat[12][12]){
                         vector<int> next_node = Next_Node(x, y, dir);
                         x = next_node[0];
                         y = next_node[1];
+                        if(x < 0 || x >= 12 || y < 0 || y >= 12) break;
                         if(mapStat[x][y] == 0){
                             vector<int> tmp1 = {i, j, l, dir};
                             res.push_back(tmp1);
@@ -167,7 +173,7 @@ public:
 
     double UCB1() {
         if (visit == 0) return 1e9;
-		return (double)win / (double)visit + (double)1.41421 * sqrt((double)log(parent->visit) / double(visit));
+		return (double)(win) / (double)visit + c * sqrt((double)log(parent->visit) / (double)visit);
     }
 
     mctsNode* parent;
@@ -181,15 +187,12 @@ public:
     vector<mctsNode*> children;
 };
 
-const int T = 1000;
-int cur_player = 1;
-
 class MCTSPlayer {
 public:
     MCTSPlayer(int player, int parallel, const int mapStat[12][12]) : player(player), parallel(parallel) {
-        engine.seed(std::chrono::system_clock::now().time_since_epoch().count());
+        engine.seed(rd());
         for (int i = 0; i < parallel; i++) {
-            roots.push_back(new mctsNode(mapStat, (player == 1 ? 2 : 1)));
+            roots.push_back(new mctsNode(mapStat, (player == id ? 2 : id)));
         }
     }
 
@@ -227,24 +230,26 @@ public:
 				best_action = i.first;
 			}
 		}
-
+        // cout << max_visit << endl;s
 		return best_action;
     }
 
     void mcts(const int mapStat[12][12], int thread_idx){
+        mt19937 thread_engine;
+        thread_engine.seed(rd());
         const auto threshold = std::chrono::milliseconds(T);
-        int num_of_simulations = 13500;
+        int num_of_simulations = 20000;
 
         delete roots[thread_idx];
-        roots[thread_idx] = new mctsNode(mapStat, (player == 1 ? 2 : 1));
+        roots[thread_idx] = new mctsNode(mapStat, (player == id ? 2 : id));
         auto root = roots[thread_idx];
 
         auto start_time = std::chrono::high_resolution_clock::now();
         int cnt = 0;
-        while(num_of_simulations -- && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_time) < threshold){
+        while(num_of_simulations-- && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_time) < threshold){
             cnt ++;
             mctsNode* node = root;
-            while (node->children.size() != 0 && node->expand_idx == node->children.size()) {
+            while (node->children.size() != 0 && node->expand_idx == (int)node->children.size()) {
                 double max_ucb = -1e9;
                 mctsNode* max_node = nullptr;
                 for (auto& child : node->children) {
@@ -261,7 +266,7 @@ public:
             if (node->end_state == false && (int)node->children.size() == 0){
                 auto legal_moves = get_legal_moves(node->mapStat);
                 if(legal_moves.size() != 0){
-                    shuffle(legal_moves.begin(), legal_moves.end(), engine);
+                    shuffle(legal_moves.begin(), legal_moves.end(), thread_engine);
                     for (auto& action: legal_moves){
                         int new_mapStat[12][12];
                         for (int i = 0; i < 12; i++) {
@@ -273,14 +278,14 @@ public:
                         int y = action[1];
                         int l = action[2];
                         int dir = action[3];
-                        new_mapStat[x][y] = (node->player == 1 ? 2 : 1);
+                        new_mapStat[x][y] = (node->player == id ? 2 : id);
                         for(int i=1;i<l;i++){
                             vector<int> next_node = Next_Node(x, y, dir);
                             x = next_node[0];
                             y = next_node[1];
-                            new_mapStat[x][y] = (node->player == 1 ? 2 : 1);
+                            new_mapStat[x][y] = (node->player == id ? 2 : id);
                         }
-                        node->children.push_back(new mctsNode(node, action, new_mapStat, false, (node->player == 1 ? 2 : 1)));
+                        node->children.push_back(new mctsNode(node, action, new_mapStat, false, (node->player == id ? 2 : id)));
                     }
                 } else {
                     node->end_state = true;
@@ -293,7 +298,7 @@ public:
                 int idx = node->expand_idx;
                 node->expand_idx ++;
                 node = node->children[idx];
-                int player = (node->player == 1 ? 2 : 1);
+                int player = (node->player == id ? 2 : id);
                 int cur_state[12][12];
                 for (int i = 0; i < 12; i++) {
                     for (int j = 0; j < 12; j++) {
@@ -306,7 +311,7 @@ public:
                         winner = player;
                         break;
                     }
-                    shuffle(legal_moves.begin(), legal_moves.end(), engine);
+                    shuffle(legal_moves.begin(), legal_moves.end(), thread_engine);
                     int x = legal_moves[0][0];
                     int y = legal_moves[0][1];
                     int l = legal_moves[0][2];
@@ -318,26 +323,25 @@ public:
                         y = next_node[1];
                         cur_state[x][y] = player;
                     }
-                    player = (player == 1 ? 2 : 1);
+                    player = (player == id ? 2 : id);
                 }
             } else {
-                winner = (node->player == 1 ? 2 : 1);
+                winner = (node->player == id ? 2 : id);
             }
-
             while(node != nullptr){
                 node->visit ++;
                 if (node->player == winner) node->win ++;
+                // node -> win += (winner == id ? 1 : 0);
                 node = node->parent;
             }
         }
+        // cout << cnt << endl;
     }
 
-
-    int player = cur_player;    
+    int player = id;    
     int parallel = 1;
-    int T = 1500;
     vector<mctsNode*> roots;
-    std::default_random_engine engine;
+    std::mt19937 engine;
 };
 
 
@@ -347,12 +351,24 @@ vector<int> GetStep(MCTSPlayer& player, int mapStat[12][12], int gameStat[12][12
     return step;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
     int id_package;
     int mapStat[12][12];
     int gameStat[12][12];
-    MCTSPlayer player = MCTSPlayer(cur_player, 3, gameStat);
+
+    int parallel = 7;
+    if(argc > 1){
+        parallel = stoi(argv[1]);
+        if(argc > 2){
+            T = stoi(argv[2]);
+            if(argc > 3){
+                c = stod(argv[3]);
+            }
+        }
+    }
+
+    MCTSPlayer player = MCTSPlayer(id, parallel, gameStat);
 
     while (true)
     {

@@ -17,7 +17,7 @@ const char* infoServer[] = { "localhost", "8888" };
 	TODO:
 	請將 idTeam 改成學號,若開頭為0請去掉
 */
-int idTeam = 1;
+int idTeam = 110550088;
 
 class _WSAData
 {
@@ -232,10 +232,6 @@ bool GetBoard(int& id_package, int mapStat[12][12], int gameStat[12][12])
 			}
 		}
 	}
-
-
-
-
 
 	return false;
 }

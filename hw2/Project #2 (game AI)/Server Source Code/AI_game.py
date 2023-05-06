@@ -12,13 +12,19 @@ import numpy as np
 import random
 from gameRule import checkMoveValidation, end_game_check, checkRemainMove, Getstep
 from gameRule import initialMap, play
+from time import sleep
 
-def battle(teamID, node_num, seed):
+win_count = 0
+total = 50
+
+def battle(teamID, node_num, seed, race=1):
     '''
 
     :param teamID: 2 teams in this game
     :return:
     '''
+
+    global win_count
 
     initMapStat, initGameStat = initialMap(node_num, seed)
 
@@ -76,8 +82,8 @@ def battle(teamID, node_num, seed):
             print(f"player {player} disconnected.")
             action_record['text'] = action_record['text'] + "player " + str(player) + " disconnected.\n\n"
         else:
-            print('movement: {}\n'.format(movement))
-            print(f"map\n", map_current.T)
+            #print('movement: {}\n'.format(movement))
+            #print(f"map\n", map_current.T)
             action_record['text'] = action_record['text'] + 'movement: ' + str(movement) + '\n\n'
 
             legality_tag = checkMoveValidation(player, map_current, movement)
@@ -114,15 +120,20 @@ def battle(teamID, node_num, seed):
 
     winner = (lose_player % 2) + 1
 
-    UI = gameUI.gameUI(replay, initMapStat, initGameStat, teamID, winner, node_num, seed)
+    if winner == 1:
+        win_count += 1
+
+    print(f"Game {race}. Winner is player {winner}.")
+
+    # UI = gameUI.gameUI(replay, initMapStat, initGameStat, teamID, winner, node_num, seed)
 
     # UI.show_result(replay)
-    UI.window.mainloop()  # 運行視窗程式
+    # UI.window.mainloop()  # 運行視窗程式
 
     return
 
 
-def main():
+def main(race=1):
     teams = [0, 0]
     path = ['', '']
 
@@ -158,13 +169,17 @@ def main():
     if (not success):
         print("connection fail, teamId:", failId)
     else:
-        battle(teams, node_num, seed)
+        battle(teams, node_num, seed, race)
 
     STcpServer.StopMatch()
 
 
 if __name__ == "__main__":
-    main()
+    for i in range(total):
+        main(i)
+        print(f"win rate: {win_count/(i+1)}. Total game: {i+1}. Win game: {win_count}.")
+        sleep(1)
+        
     os.system('pause')
 
 
