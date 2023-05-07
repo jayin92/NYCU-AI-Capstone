@@ -10,3 +10,4 @@
 
 ## Homework 3
 - Use logical inference, especially, resolution, to solve minesweeper game
+- Doesn't implement the process of guess a cell.
