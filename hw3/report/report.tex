@@ -191,12 +191,30 @@ Hard                & $16 \times 30$      & 99                       \\ \bottomr
 
 The results below is running on my personal computer with single thread program. For each difficulty, I tested 5 games, and each game is running independently.
 
+\autoref{tab:difficulty} shows the performance with different difficulty. For easy and medium, the game AI can solve it within 5 seconds. However, for the hard level, the execution time becomes $168.49\pm104.7$, which grows much compared with easy and medium level. This is because the process of pairwise matching and resolution grows exponentially in time.
+
+\begin{table}[H]
+\centering
+\caption{The execution time, win and stuck status with different difficulty. I also record the average remaining unmarked cell when stuck. For the hard level, this number is 20.33, which is not much.}
+\label{tab:difficulty}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+\textbf{Difficulty} & \textbf{Win} & \textbf{Stuck} & \textbf{Avg. Time} & \textbf{Std. Time} \\ \midrule
+Easy   & 5 & 0 & 0.29   & 0.15  \\
+Medium & 5 & 0 & 2.65   & 1.86  \\
+Hard   & 2 & 3 & 168.49 & 104.7 \\ \bottomrule
+\end{tabular}%
+}
+\end{table}
+
 \subsection{Performance of Different Number of Initial Safe Cell}
 
 At the beginning of the game, the game module would first give the player the positions of some initial safe cell. The default value for the number of these safe cells is $\sqrt{\text{\# of cell in board}}$. In this section, I will test how this number effect the running time for the program. And because running this experiments with hard difficulty is time-consuming, I will run the experiment with medium difficulty. 
 
 The default value of initial safe cell is 16. I will change this number to 8, 16, 32, 64, 128 and 231. And measure the average running time of 5 games. 
 
+As we can see in \autoref{tab:safe}. I originally expect that as the number of initial safe cell increasing, the running time will decrease, because the more initial safe cells, the possibility of running pairwise decrease, thus make the program run faster. But the experiments turns out it's not the case. The first part of my guess is correct. Indeed, the number of pairwise matching decrease when the safe cell increases. However, the second part is not correct, I think the main reason is when the safe cell increases, the number of clauses in \texttt{KB} also increase. Thus, when moving clause from \texttt{KB} to \texttt{KB0}, the resolution process take more time than original setting. I also experiment the special case, which initial safe cells are all safe cells. In this case, because it won't enter the pairwise matching, the execution time is less than 64 and 128.
 
 \begin{table}[H]
 \centering
@@ -222,8 +240,7 @@ In this section, I will mainly talk about the conclusion toward this homework, a
 
 First of all, this homework let me understand the concept of logical inference, and how it can apply to solve a real world problem. However, this method is quite time-consuming, because we need to apply resolution repeatedly to many clauses in knowledge base.
 
-Therefore, for future work, I want to first improve the performance of my program. This program has much space to improve, including the data structure to store clauses and the matching process.
-
+Therefore, for future work, I want to first improve the performance of my program. This program has much space to improve, including the data structure to store clauses and the matching process. And also, this game AI is not able to guess the cell when stuck. Therefore, I would like to make the game AI able to guess when stuck.
 
 \clearpage
 \pagenumbering{arabic}% resets `page` counter to 1
@@ -728,6 +745,9 @@ def matching_clauses(a: Clause, b: Clause):
     b : Clause
         The second clause after matching
     '''
+    if len(a) > 2 and len(b) > 2:
+        return a, b
+    
     if a == b:
         return a, None
     
@@ -737,9 +757,8 @@ def matching_clauses(a: Clause, b: Clause):
     if b.literals.issubset(a.literals):
         return b, None
     
-    if len(a) > 2 and len(b) > 2:
-        return a, b
-    
+    a = Clause(a.literals.copy())
+    b = Clause(b.literals.copy())
     
     comps = set()
     for i in a.literals:
